@@ -6,6 +6,7 @@
 package ai.preferred.crawler.example.master;
 
 import ai.preferred.crawler.example.EntityCSVStorage;
+import ai.preferred.crawler.example.entity.Car;
 import ai.preferred.crawler.example.entity.Listing;
 import ai.preferred.venom.Crawler;
 import ai.preferred.venom.Session;
@@ -29,6 +30,7 @@ public class ListingCrawler {
 
   // Create session keys for things you would like to retrieve from handler
   static final Session.Key<ArrayList<Listing>> JOB_LIST_KEY = new Session.Key<>();
+
 
   // Create session keys for CSV printer to print from handler
   static final Session.Key<EntityCSVStorage> CSV_STORAGE_KEY = new Session.Key<>();

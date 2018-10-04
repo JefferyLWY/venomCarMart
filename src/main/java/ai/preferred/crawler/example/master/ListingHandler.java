@@ -6,10 +6,12 @@
 package ai.preferred.crawler.example.master;
 
 import ai.preferred.crawler.example.EntityCSVStorage;
+import ai.preferred.crawler.example.entity.Car;
 import ai.preferred.crawler.example.entity.Listing;
 import ai.preferred.venom.Handler;
 import ai.preferred.venom.Session;
 import ai.preferred.venom.Worker;
+import ai.preferred.venom.job.Priority;
 import ai.preferred.venom.job.Scheduler;
 import ai.preferred.venom.request.Request;
 import ai.preferred.venom.request.VRequest;
@@ -33,7 +35,7 @@ public class ListingHandler implements Handler {
 
     // Get the job listing array list we created
     final ArrayList<Listing> jobListing = session.get(ListingCrawler.JOB_LIST_KEY);
-
+    
     // Get the job listing array list we created
     final EntityCSVStorage csvStorage = session.get(ListingCrawler.CSV_STORAGE_KEY);
 
@@ -60,14 +62,14 @@ public class ListingHandler implements Handler {
 
     for(Listing listing : finalResult.getListings()){
         
-        LOGGER.info("Found {} job: {} in {} [{}]", Integer.toString(++i), listing.getName(), listing.getCompany(), listing.getUrl());
-        scheduler.add(new VRequest(listing.getUrl()), this);
+        LOGGER.info("Found {} car: {} in {} [{}]", Integer.toString(++i), listing.getName(), listing.getCompany(), listing.getUrl());
+        scheduler.add(new VRequest(listing.getUrl()), new carHandler(), Priority.HIGHEST);
         
         // Add to the array list
         jobListing.add(listing);
 
         // Write record in CSV
-        csvStorage.append(listing);
+//        csvStorage.append(lissting);
     }
     
     // Crawl another page if there's a next page
@@ -79,4 +81,5 @@ public class ListingHandler implements Handler {
     }
 
   }
+  
 }

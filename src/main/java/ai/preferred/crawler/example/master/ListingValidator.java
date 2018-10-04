@@ -41,7 +41,14 @@ public class ListingValidator implements Validator {
 //      return Status.VALID;
 //    }
     final Document document = vResponse.getJsoup();
-    if (document.select("table > form[name=\"listingform\"]").first()!=null) {
+    
+    if (request.getUrl().startsWith("https://www.sgcarmart.com/used_cars/info.php?")){
+        if (document.select("#main_left > div.blue_curvebanner.box_header > div").first() != null){
+            return Status.VALID;
+        }
+        
+    }
+    else if (document.select("table > form[name=\"listingform\"]").first()!=null) {
         
       return Status.VALID;
     }

@@ -32,6 +32,27 @@ public class Car {
     private  String noOfOwners;
     private  String typeOfOVeh;
     private  String category;
+    
+    private String others;
+
+    /**
+     * Get the value of others
+     *
+     * @return the value of others
+     */
+    public String getOthers() {
+        return others;
+    }
+
+    /**
+     * Set the value of others
+     *
+     * @param others new value of others
+     */
+    public void setOthers(String others) {
+        this.others = others;
+    }
+
 
     public Car(){
         

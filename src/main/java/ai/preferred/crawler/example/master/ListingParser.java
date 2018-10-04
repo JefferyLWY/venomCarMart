@@ -1,5 +1,6 @@
 package ai.preferred.crawler.example.master;
 
+import ai.preferred.crawler.example.entity.Car;
 import ai.preferred.crawler.example.entity.Listing;
 import ai.preferred.venom.response.VResponse;
 import org.jsoup.nodes.Document;
@@ -14,95 +15,84 @@ import java.util.List;
  */
 public class ListingParser {
 
-  public static class FinalResult {
+    public static class FinalResult {
+        //Declaration of object variables
+        private final List<Car> cars;
+        private final String nextPage;
+        
+        //Constructor
+        private FinalResult(List<Car> cars, String nextPage) {
+            this.cars = cars;
+            this.nextPage = nextPage;
+        }
+        
+        //Object Methods
+        public List<Car> getListings() {
+            return cars;
+        }
 
-    private final List<Listing> listings;
-
-    private final String nextPage;
-
-    private FinalResult(List<Listing> listings, String nextPage) {
-      this.listings = listings;
-      this.nextPage = nextPage;
-    }
-
-    public List<Listing> getListings() {
-      return listings;
-    }
-
-    public String getNextPage() {
-      return nextPage;
-    }
-  }
-
-  public static FinalResult parse(VResponse response) {
-    final Document document = response.getJsoup();
-    return new FinalResult(
-        parseListings(document),
-        parseNextPage(document)
-    );
-  }
-
-  private static List<Listing> parseListings(Document document) {
-    final ArrayList<Listing> jobList = new ArrayList<>();
-
-    //TEST Commenting - Original
+        public String getNextPage() {
+            return nextPage;
+        }
+    } // End of FinalResult Class
     
-//    final Elements jobs = document.select("div.listResults div.-item");
-//
-//    for (Element job : jobs) {
-//      final Element title = job.select("div.-job-summary > div.-title > h2 > a").first();
-//      final String name = title.text();
-//      final String url = title.attr("abs:href");
-//
-//      final String company = job.select("div.fc-black-700 span:nth-of-type(1)").first().text();
-//
-//      final Listing listing = new Listing(url, name, company);
-//
-//      jobList.add(listing);
-//    }
-
-    final String sel = "#contentblank > table > tbody > tr > td > table > tbody > tr > td > table > tbody > tr > td > table > tbody > tr:nth-child(1) > td:nth-child(2) > table > tbody > tr > td:nth-child(2) > div > strong";
-    final Elements cars = document.select(sel);
-    for (Element car : cars) {
-       
-      final Element a = car.getElementsByTag("a").first();
-      final String url = a.attr("abs:href");
-      final String name = a.text();
-      final String company = "Test";
-      
-      final Listing listing = new Listing(url, name, company);
-      
-
-      jobList.add(listing);
+    //Obtain list of cars and url for next page
+    public static FinalResult parse(VResponse response) {
+        final Document document = response.getJsoup();
+        return new FinalResult(
+                parseCars(document),
+                parseNextPage(document)
+        );
     }
+    //Return a list of cars parsef from the results page
+    private static List<Car> parseCars(Document document) {
+        final ArrayList<Car> jobList = new ArrayList<>();
+        
+        //Selector to select all rows of cars
+        final String sel = "#contentblank > table > tbody > tr > td > table > tbody > tr > td > table > tbody > tr > td > table > tbody > tr:nth-child(1) > td:nth-child(2) > table > tbody > tr > td:nth-child(2) > div > strong";
+        final Elements cars = document.select(sel);
+        
+        //For each car row found, extract the url and car make+model
+        for (Element car : cars) {
 
-    return jobList;
-  }
+            final Element a = car.getElementsByTag("a").first();
+            final String url = a.attr("abs:href");
+            final String name = a.text();
+//            final String company = "Test";
 
-  public static String parseNextPage(Document document) {
-    final String sel2 = "#contentblank > div:nth-child(4) > div:nth-child(4) > a.pagebar";
+            final Car carObj = new Car(name, url);
+//      final Ca listing = new Listing(url, name, company);
+
+            jobList.add(carObj);
+        }
+
+        return jobList; //List of all car listings found to be crawled
+    }
+    
+    //Find the next results page to crawl
+    public static String parseNextPage(Document document) {
+        final String sel2 = "#contentblank > div:nth-child(4) > div:nth-child(4) > a.pagebar";
 //    final Element nextPage = document.select("a.prev-next.test-pagination-next").first();
 //    if (nextPage == null) {
 //      return null;
 //    }
-    
-    final Elements Pages = document.select(sel2);
-    boolean first = true;
-    Element e = null;
-    
-    if(Pages.size()==1){
-        if(first){
-            e = Pages.get(0);
-            first=false;
+
+        final Elements Pages = document.select(sel2);
+        Element e = null;
+        
+        if (Pages.size() == 1) {
+            if (Pages.get(0).text().equals("Next ")){
+                e = Pages.get(0);
+            }
+            else{
+                return null;
+            }
+
         } else {
-            return null;
+            e = Pages.get(1);
         }
-          
-    } else {
-        e = Pages.get(1);
+
+        return e.attr("abs:href");
     }
-    
-    return e.attr("abs:href");
-  }
 
 }

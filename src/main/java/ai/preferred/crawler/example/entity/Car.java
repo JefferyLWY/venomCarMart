@@ -10,8 +10,7 @@ package ai.preferred.crawler.example.entity;
  * @author admin
  */
 public class Car {
-    private  String name;
-    private  String url;
+    private  String name;   
     private  String price;
     private  String depreciation;
     private  String regDate;
@@ -30,9 +29,9 @@ public class Car {
     private  String arf;
     private  String deregValue;
     private  String noOfOwners;
-    private  String typeOfOVeh;
+    private  String typeOfVeh;
     private  String category;
-    
+    private  String url;
     private String others;
 
     /**
@@ -219,11 +218,11 @@ public class Car {
     }
 
     public String getTypeOfOVeh() {
-        return typeOfOVeh;
+        return typeOfVeh;
     }
 
-    public void setTypeOfOVeh(String typeOfOVeh) {
-        this.typeOfOVeh = typeOfOVeh;
+    public void setTypeOfVeh(String typeOfOVeh) {
+        this.typeOfVeh = typeOfOVeh;
     }
 
     public String getCategory() {

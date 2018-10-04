@@ -27,59 +27,46 @@ import java.util.ArrayList;
  */
 public class ListingHandler implements Handler {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(ListingHandler.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ListingHandler.class);
 
-  @Override
-  public void handle(Request request, VResponse response, Scheduler scheduler, Session session, Worker worker) {
-    LOGGER.info("Processing {}", request.getUrl());
+    @Override
+    public void handle(Request request, VResponse response, Scheduler scheduler, Session session, Worker worker) {
+        LOGGER.info("Processing {}", request.getUrl());
 
-    // Get the job listing array list we created
-    final ArrayList<Listing> jobListing = session.get(ListingCrawler.JOB_LIST_KEY);
-    
-    // Get the job listing array list we created
-    final EntityCSVStorage csvStorage = session.get(ListingCrawler.CSV_STORAGE_KEY);
+        // Get the job listing array list we created
+        final ArrayList<Car> jobListing = session.get(ListingCrawler.JOB_LIST_KEY);
 
-    // Get HTML
-    final String html = response.getHtml();
+        // Get the job listing array list we created
+        final EntityCSVStorage csvStorage = session.get(ListingCrawler.CSV_STORAGE_KEY);
 
-    // JSoup
-    final Document document = response.getJsoup();
+        // Get HTML
+        final String html = response.getHtml();
 
-    // We will use a parser class
-    final ListingParser.FinalResult finalResult = ListingParser.parse(response);
-    int i = 0;
-    
-//    finalResult.getListings().forEach(listing -> {
-//      
-//      LOGGER.info("Found job: {} in {} [{}]",  listing.getName(), listing.getCompany(), listing.getUrl());
-//
-//      // Add to the array list
-//      jobListing.add(listing);
-//
-//      // Write record in CSV
-//      csvStorage.append(listing);
-//    });
+        // JSoup
+        final Document document = response.getJsoup();
 
-    for(Listing listing : finalResult.getListings()){
-        
-        LOGGER.info("Found {} car: {} in {} [{}]", Integer.toString(++i), listing.getName(), listing.getCompany(), listing.getUrl());
-        scheduler.add(new VRequest(listing.getUrl()), new carHandler(), Priority.HIGHEST);
-        
-        // Add to the array list
-        jobListing.add(listing);
+        // We will use a parser class
+        final ListingParser.FinalResult finalResult = ListingParser.parse(response); //finalresult contains a list of car listings and a url for the next results page
+        int i = 0;
 
-        // Write record in CSV
-//        csvStorage.append(lissting);
-    }
-    
-    // Crawl another page if there's a next page
-    if (finalResult.getNextPage() != null) {
-      final String nextPageURL = finalResult.getNextPage();
-      
-      // Schedule the next page
-      scheduler.add(new VRequest(nextPageURL), this);
+        for (Car carObj : finalResult.getListings()) { //Loop through each car result in page
+            //Each carObj contains car make+model and listing URL
+            LOGGER.info("Found {} car: {} [{}]", Integer.toString(++i), carObj.getName(), carObj.getUrl());
+            //Add a new job to the scheduler for each car found
+            scheduler.add(new VRequest(carObj.getUrl()), new carHandler(), Priority.HIGHEST); //Set the priority of the car listing crawl to highest
+
+            // Add to the array list
+            jobListing.add(carObj);
+        }
+
+        // Crawl another page if there's a next page
+        if (finalResult.getNextPage() != null) {
+            final String nextPageURL = finalResult.getNextPage();
+
+            // Schedule the next page
+            scheduler.add(new VRequest(nextPageURL), this);
+        }
+
     }
 
-  }
-  
 }

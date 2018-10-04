@@ -41,7 +41,8 @@ public class EntityCSVStorage implements AutoCloseable {
     }
     return result;
   }
-
+  
+  //Modified append method to use the object Car as a variable instead of listing
   public synchronized boolean append(Car car) {
     try {
       printer.printRecord(toList(car));

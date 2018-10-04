@@ -1,5 +1,6 @@
 package ai.preferred.crawler.example;
 
+import ai.preferred.crawler.example.entity.Car;
 import ai.preferred.crawler.example.entity.Listing;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
@@ -20,7 +21,7 @@ public class EntityCSVStorage implements AutoCloseable {
 
   public EntityCSVStorage(String file) throws IOException {
     printer = new CSVPrinter(new FileWriter(file), CSVFormat.EXCEL);
-    printer.printRecord(getHeaderList(Listing.class));
+    printer.printRecord(getHeaderList(Car.class));
   }
 
   private static List<String> getHeaderList(Class clazz) {
@@ -41,9 +42,9 @@ public class EntityCSVStorage implements AutoCloseable {
     return result;
   }
 
-  public synchronized boolean append(Listing listing) {
+  public synchronized boolean append(Car car) {
     try {
-      printer.printRecord(toList(listing));
+      printer.printRecord(toList(car));
       printer.flush();
     } catch (IOException | IllegalAccessException e) {
       LOGGER.error("unable to store property: ", e);
